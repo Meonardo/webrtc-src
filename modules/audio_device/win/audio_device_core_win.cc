@@ -29,12 +29,11 @@
 #include "modules/audio_device/win/audio_device_core_win.h"
 // clang-format on
 
-#include <string.h>
-
 #include <comdef.h>
 #include <dmo.h>
 #include <functiondiscoverykeys_devpkey.h>
 #include <mmsystem.h>
+#include <string.h>
 #include <strsafe.h>
 #include <uuids.h>
 #include <windows.h>
@@ -542,7 +541,7 @@ AudioDeviceWindowsCore::~AudioDeviceWindowsCore() {
     _hShutdownCaptureEvent = NULL;
   }
 
-  if(NULL != _deviceStateListener) {
+  if (NULL != _deviceStateListener) {
     delete _deviceStateListener;
     _deviceStateListener = NULL;
   }
@@ -3267,9 +3266,10 @@ DWORD AudioDeviceWindowsCore::DoCaptureThread() {
         QueryPerformanceCounter(&t1);
 
         // Get the current recording and playout delay.
-        uint32_t sndCardRecDelay = (uint32_t)(
-            ((((UINT64)t1.QuadPart * _perfCounterFactor) - recTime) / 10000) +
-            (10 * syncBufIndex) / _recBlockSize - 10);
+        uint32_t sndCardRecDelay =
+            (uint32_t)(((((UINT64)t1.QuadPart * _perfCounterFactor) - recTime) /
+                        10000) +
+                       (10 * syncBufIndex) / _recBlockSize - 10);
         uint32_t sndCardPlayDelay = static_cast<uint32_t>(_sndCardPlayDelay);
 
         while (syncBufIndex >= _recBlockSize) {
@@ -3910,49 +3910,70 @@ int32_t AudioDeviceWindowsCore::SetAudioDeviceSink(AudioDeviceSink* sink) {
   return 0;
 }
 
-void AudioDeviceWindowsCore::DeviceStateListener::SetAudioDeviceSink(AudioDeviceSink *sink) {
+void AudioDeviceWindowsCore::DeviceStateListener::SetAudioDeviceSink(
+    AudioDeviceSink* sink) {
   callback_ = sink;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceStateChanged => " << pwstrDeviceId << ", NewState => " << dwNewState;
-  if(callback_) callback_->OnDevicesUpdated();
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceStateChanged(
+    LPCWSTR pwstrDeviceId,
+    DWORD dwNewState) {
+  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceStateChanged => "
+                    << pwstrDeviceId << ", NewState => " << dwNewState;
+  if (callback_)
+    callback_->OnDevicesUpdated();
   return S_OK;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceAdded(LPCWSTR pwstrDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceAdded => " << pwstrDeviceId;
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceAdded(
+    LPCWSTR pwstrDeviceId) {
+  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceAdded => "
+                    << pwstrDeviceId;
   return S_OK;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceRemoved(LPCWSTR pwstrDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceRemoved => " << pwstrDeviceId;
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceRemoved(
+    LPCWSTR pwstrDeviceId) {
+  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceRemoved => "
+                    << pwstrDeviceId;
   return S_OK;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDefaultDeviceChanged => " << pwstrDefaultDeviceId;
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDefaultDeviceChanged(
+    EDataFlow flow,
+    ERole role,
+    LPCWSTR pwstrDefaultDeviceId) {
+  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDefaultDeviceChanged => "
+                    << pwstrDefaultDeviceId;
   return S_OK;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, const PROPERTYKEY key) {
-  //RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnPropertyValueChanged => " << pwstrDeviceId;
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnPropertyValueChanged(
+    LPCWSTR pwstrDeviceId,
+    const PROPERTYKEY key) {
+  // RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnPropertyValueChanged => "
+  // << pwstrDeviceId;
   return S_OK;
 }
 
+// TODO(henrika): only used for debugging purposes currently.
 ULONG AudioDeviceWindowsCore::DeviceStateListener::AddRef() {
   ULONG new_ref = InterlockedIncrement(&ref_count_);
   // RTC_DLOG(LS_INFO) << "__AddRef => " << new_ref;
   return new_ref;
 }
 
+// TODO(henrika): does not call delete this.
 ULONG AudioDeviceWindowsCore::DeviceStateListener::Release() {
   ULONG new_ref = InterlockedDecrement(&ref_count_);
   // RTC_DLOG(LS_INFO) << "__Release => " << new_ref;
   return new_ref;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::QueryInterface(REFIID iid, void** object) {
+// TODO(henrika): can probably be replaced by "return S_OK" only.
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::QueryInterface(
+    REFIID iid,
+    void** object) {
   if (object == nullptr) {
     return E_POINTER;
   }
