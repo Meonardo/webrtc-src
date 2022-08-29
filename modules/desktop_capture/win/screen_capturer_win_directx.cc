@@ -72,9 +72,14 @@ bool ScreenCapturerWinDirectx::GetScreenListFromDeviceNames(
     if (it == gdi_names.end()) {
       // devices_names[i] has not been found in gdi_names, so use max_screen_id.
       max_screen_id++;
-      screens->push_back({max_screen_id});
+      screens->push_back({max_screen_id, device_name});
     } else {
-      screens->push_back({gdi_screens[it - gdi_names.begin()]});
+      DesktopCapturer::Source s = gdi_screens[it - gdi_names.begin()];
+      std::string title = s.title;
+      if (title.empty()) {
+        title = device_name;
+      }
+      screens->push_back({gdi_screens[it - gdi_names.begin()].id, title});
     }
   }
 
