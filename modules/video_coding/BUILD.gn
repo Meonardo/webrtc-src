@@ -168,6 +168,10 @@ rtc_library("video_coding") {
     "h264_sprop_parameter_sets.h",
     "h264_sps_pps_tracker.cc",
     "h264_sps_pps_tracker.h",
+
+    "h265_vps_sps_pps_tracker.cc",
+    "h265_vps_sps_pps_tracker.h",
+
     "include/video_codec_initializer.h",
     "inter_frame_delay.cc",
     "inter_frame_delay.h",

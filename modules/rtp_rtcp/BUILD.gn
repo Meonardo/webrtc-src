@@ -239,6 +239,11 @@ rtc_library("rtp_rtcp") {
     "source/video_rtp_depacketizer_vp8.h",
     "source/video_rtp_depacketizer_vp9.cc",
     "source/video_rtp_depacketizer_vp9.h",
+    
+    "source/rtp_format_h265.cc",
+    "source/rtp_format_h265.h",
+    "source/video_rtp_depacketizer_h265.cc",
+    "source/video_rtp_depacketizer_h265.h",
   ]
 
   if (rtc_enable_bwe_test_logging) {
