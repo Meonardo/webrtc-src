@@ -47,6 +47,7 @@ enum HistogramCodecType {
   kVideoVp9 = 2,
   kVideoH264 = 3,
   kVideoAv1 = 4,
+  kVideoH265 = 5,
   kVideoMax = 64,
 };
 
@@ -74,10 +75,13 @@ HistogramCodecType PayloadNameToHistogramCodecType(
       return kVideoVp9;
     case kVideoCodecH264:
       return kVideoH264;
+<<<<<<< HEAD
     case kVideoCodecAV1:
       return kVideoAv1;
-    default:
-      return kVideoUnknown;
+    == == == = case kVideoCodecH265:
+      return kVideoH265;
+>>>>>>> fd95909ddc (Add H.265 codec Support.)
+      default: return kVideoUnknown;
   }
 }
 
@@ -743,8 +747,7 @@ VideoSendStream::Stats SendStatisticsProxy::GetStats() {
   PurgeOldStats();
   stats_.input_frame_rate =
       uma_container_->input_frame_rate_tracker_.ComputeRate();
-  stats_.frames =
-      uma_container_->input_frame_rate_tracker_.TotalSampleCount();
+  stats_.frames = uma_container_->input_frame_rate_tracker_.TotalSampleCount();
   stats_.content_type =
       content_type_ == VideoEncoderConfig::ContentType::kRealtimeVideo
           ? VideoContentType::UNSPECIFIED
