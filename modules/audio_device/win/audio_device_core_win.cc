@@ -33,6 +33,7 @@
 #include <mmsystem.h>
 #include <strsafe.h>
 #include <uuids.h>
+#include <atlstr.h >
 #include <windows.h>
 
 #include <iomanip>
@@ -3906,23 +3907,58 @@ void AudioDeviceWindowsCore::DeviceStateListener::SetAudioDeviceSink(AudioDevice
 }
 
 HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceStateChanged => " << pwstrDeviceId << ", NewState => " << dwNewState;
+  //RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceStateChanged => " << pwstrDeviceId << ", NewState => " << dwNewState;
   if(callback_) callback_->OnDevicesUpdated();
   return S_OK;
 }
 
 HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceAdded(LPCWSTR pwstrDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceAdded => " << pwstrDeviceId;
+  //RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceAdded => " << pwstrDeviceId;
+  std::string device_id;
+  if (pwstrDeviceId)
+    device_id = rtc::ToUtf8(pwstrDeviceId);
+
+  if (callback_)
+    callback_->OnDevicesChanged(AudioDeviceSink::kAdded,
+                                AudioDeviceSink::kUndefined, device_id.c_str());
   return S_OK;
 }
 
 HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDeviceRemoved(LPCWSTR pwstrDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceRemoved => " << pwstrDeviceId;
+  //RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDeviceRemoved => " << pwstrDeviceId;
+  std::string device_id;
+  if (pwstrDeviceId)
+    device_id = rtc::ToUtf8(pwstrDeviceId);
+
+  if (callback_)
+    callback_->OnDevicesChanged(AudioDeviceSink::kRemoved,
+                                AudioDeviceSink::kUndefined, device_id.c_str());
   return S_OK;
 }
 
-HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId) {
-  RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDefaultDeviceChanged => " << pwstrDefaultDeviceId;
+HRESULT AudioDeviceWindowsCore::DeviceStateListener::OnDefaultDeviceChanged(
+    EDataFlow flow,
+    ERole role,
+    LPCWSTR pwstrDeviceId) {
+  //RTC_DLOG(LS_INFO) << "AudioDeviceWindowsCore::OnDefaultDeviceChanged => " << pwstrDefaultDeviceId;
+  //  Only listen for console and communication device changes.
+  if ((role != eConsole && role != eCommunications) ||
+      (flow != eRender && flow != eCapture)) {
+    return S_OK;
+  }
+
+  AudioDeviceSink::DeviceType device_type = AudioDeviceSink::kCapture;
+  if (flow == eRender) {
+    device_type = AudioDeviceSink::kPlayout;
+  }
+
+  std::string device_id;
+  if (pwstrDeviceId)
+    device_id = rtc::ToUtf8(pwstrDeviceId);
+
+  if (callback_)
+    callback_->OnDevicesChanged(AudioDeviceSink::kDefaultChanged, device_type,
+                                device_id.c_str());
   return S_OK;
 }
 
