@@ -23,10 +23,25 @@ class AudioDeviceModuleForTest;
 // Sink for callbacks related to a audio device.
 class AudioDeviceSink {
  public:
+  enum EventType {
+    kUnknown = 0,
+    kAdded,
+    kRemoved,
+    kDefaultChanged,
+    kStateChanged
+  };
+
+  enum DeviceType { kUndefined = 0, kCapture, kPlayout };
+
+ public:
   virtual ~AudioDeviceSink() = default;
 
   // input/output devices updated or default device changed
-  virtual void OnDevicesUpdated() = 0;
+  virtual void OnDevicesUpdated() {}
+
+  virtual void OnDevicesChanged(EventType e,
+                                DeviceType t,
+                                const char* device_id) {}
 };
 
 class AudioDeviceModule : public rtc::RefCountInterface {
