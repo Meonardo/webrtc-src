@@ -21,6 +21,7 @@ namespace webrtc {
 
 class AudioDeviceBuffer;
 class FineAudioBuffer;
+class AudioDeviceSink;
 
 namespace webrtc_win {
 
@@ -53,6 +54,7 @@ class CoreAudioOutput final : public CoreAudioBase, public AudioOutput {
 
   CoreAudioOutput(const CoreAudioOutput&) = delete;
   CoreAudioOutput& operator=(const CoreAudioOutput&) = delete;
+  int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) override;
 
  private:
   void ReleaseCOMObjects();

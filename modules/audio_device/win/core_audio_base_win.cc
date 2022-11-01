@@ -13,10 +13,12 @@
 #include <memory>
 #include <string>
 
+#include "modules/audio_device/include/audio_device.h"
 #include "modules/audio_device/audio_device_buffer.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
+#include "rtc_base/string_utils.h"
 #include "rtc_base/numerics/safe_conversions.h"
 #include "rtc_base/platform_thread.h"
 #include "rtc_base/time_utils.h"
@@ -179,9 +181,15 @@ CoreAudioBase::CoreAudioBase(Direction direction,
   // invalidated or the stream format has changed.
   restart_event_.Set(CreateEvent(nullptr, false, false, nullptr));
   RTC_DCHECK(restart_event_.IsValid());
+
+  enumerator_ = core_audio_utility::CreateDeviceEnumerator();
+  enumerator_->RegisterEndpointNotificationCallback(this);
+  RTC_LOG(INFO) << __FUNCTION__
+                << ":Registered endpoint notification callback.";
 }
 
 CoreAudioBase::~CoreAudioBase() {
+  enumerator_->UnregisterEndpointNotificationCallback(this);
   RTC_DLOG(LS_INFO) << __FUNCTION__;
   RTC_DCHECK_EQ(ref_count_, 1);
 }
@@ -865,6 +873,35 @@ HRESULT CoreAudioBase::OnGroupingParamChanged(LPCGUID new_grouping_param,
   return S_OK;
 }
 
+// IMMNotificationClient::OnDefaultDeviceChanged
+HRESULT __stdcall CoreAudioBase::OnDefaultDeviceChanged(
+    EDataFlow flow,
+    ERole role,
+    LPCWSTR pwstrDefaultDeviceId) {
+  // We only handle the output device.
+  RTC_LOG(LS_ERROR) << "OnDefaultDeviceChanged invoked.";
+  if (flow != eRender)
+    return S_OK;
+
+  AudioDeviceSink::DeviceType device_type = AudioDeviceSink::kCapture;
+  if (flow == eRender) {
+    device_type = AudioDeviceSink::kPlayout;
+  }
+
+  std::string device_id;
+  if (pwstrDefaultDeviceId) {
+    device_id = rtc::ToUtf8(pwstrDefaultDeviceId);
+    // this is important! the switch process will use the new default deviceId
+    device_id_ = device_id;
+  }
+
+  if (audio_device_sink_ != nullptr)
+    audio_device_sink_->OnDevicesChanged(AudioDeviceSink::kDefaultChanged,
+                                         device_type,
+                                device_id.c_str());
+  return S_OK;
+}
+
 void CoreAudioBase::ThreadRun() {
   if (!core_audio_utility::IsMMCSSSupported()) {
     RTC_LOG(LS_ERROR) << "MMCSS is not supported";
@@ -941,6 +978,11 @@ void CoreAudioBase::ThreadRun() {
 
   RTC_DLOG(LS_INFO) << "[" << DirectionToString(direction())
                     << "] ...ThreadRun stops";
+}
+
+int32_t CoreAudioBase::SetAudioDeviceSink1(webrtc::AudioDeviceSink* sink) {
+  audio_device_sink_ = sink;
+  return 0;
 }
 
 }  // namespace webrtc_win

@@ -171,6 +171,12 @@ class WindowsAudioDeviceModule : public AudioDeviceModuleForTest {
     return initialized_;
   }
 
+  int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) const override {
+    //input_->SetAudioDeviceSink(sink);
+    output_->SetAudioDeviceSink(sink);
+    return 0;
+  }
+
   int16_t PlayoutDevices() override {
     RTC_DLOG(LS_INFO) << __FUNCTION__;
     RTC_DCHECK_RUN_ON(&thread_checker_);

@@ -46,6 +46,7 @@ class AudioInput {
   virtual int RestartRecording() = 0;
   virtual bool Restarting() const = 0;
   virtual int SetSampleRate(uint32_t sample_rate) = 0;
+  //virtual int32_t SetAudioDeviceSink(AudioDeviceSink* sink) const = 0;
 };
 
 // This interface represents the main output-related parts of the complete
@@ -70,6 +71,7 @@ class AudioOutput {
   virtual int RestartPlayout() = 0;
   virtual bool Restarting() const = 0;
   virtual int SetSampleRate(uint32_t sample_rate) = 0;
+  virtual int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) = 0;
 };
 
 // Combines an AudioInput and an AudioOutput implementation to build an
