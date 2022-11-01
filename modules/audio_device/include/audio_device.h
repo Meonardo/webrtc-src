@@ -31,11 +31,7 @@ class AudioDeviceSink {
     kStateChanged
   };
 
-  enum DeviceType {
-    kUndefined = 0,
-    kCapture,
-    kPlayout
-  };
+  enum DeviceType { kUndefined = 0, kCapture, kPlayout };
 
  public:
   virtual ~AudioDeviceSink() = default;
@@ -45,8 +41,7 @@ class AudioDeviceSink {
 
   virtual void OnDevicesChanged(EventType e,
                                 DeviceType t,
-                                const char* device_id) {
-  }
+                                const char* device_id) {}
 };
 
 class AudioDeviceModule : public rtc::RefCountInterface {

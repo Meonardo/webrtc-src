@@ -12,6 +12,7 @@
 
 #include <memory>
 
+#include "modules/audio_device/include/audio_device.h"
 #include "modules/audio_device/audio_device_buffer.h"
 #include "modules/audio_device/fine_audio_buffer.h"
 #include "rtc_base/checks.h"
@@ -415,6 +416,10 @@ bool CoreAudioOutput::HandleStreamDisconnected() {
 
   RTC_DLOG(LS_INFO) << __FUNCTION__ << " --->>>";
   return true;
+}
+
+int32_t CoreAudioOutput::SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) {
+  return CoreAudioBase::SetAudioDeviceSink1(sink);
 }
 
 }  // namespace webrtc_win
