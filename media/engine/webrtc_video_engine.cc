@@ -633,7 +633,7 @@ WebRtcVideoEngine::GetRtpHeaderExtensions() const {
   for (const auto& uri :
        {webrtc::RtpExtension::kTimestampOffsetUri,
         webrtc::RtpExtension::kAbsSendTimeUri,
-        webrtc::RtpExtension::kVideoRotationUri,
+        /*webrtc::RtpExtension::kVideoRotationUri,*/
         webrtc::RtpExtension::kTransportSequenceNumberUri,
         webrtc::RtpExtension::kPlayoutDelayUri,
         webrtc::RtpExtension::kVideoContentTypeUri,
