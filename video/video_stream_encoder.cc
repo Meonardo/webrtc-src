@@ -1114,8 +1114,10 @@ void VideoStreamEncoder::ReconfigureEncoder() {
     max_framerate = std::max(stream.max_framerate, max_framerate);
   }
 
-  RTC_LOG(LS_ERROR) << "max_framerate_=" << max_framerate_
-                    << " max_framerate=" << max_framerate;
+  RTC_LOG(LS_ERROR) << " max_framerate=" << max_framerate
+                    << " minBitRate=" << codec.minBitrate
+                    << " maxBitRate=" << codec.maxBitrate
+                    << " startBitRate=" << codec.startBitrate;
 
   // The resolutions that we're actually encoding with.
   std::vector<rtc::VideoSinkWants::FrameSize> encoder_resolutions;
