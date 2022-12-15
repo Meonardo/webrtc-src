@@ -984,11 +984,6 @@ void VideoStreamEncoder::ReconfigureEncoder() {
                 last_frame_info_->width * last_frame_info_->height);
 
     if (encoder_bitrate_limits) {
-      RTC_LOG(LS_WARNING) << "encoder_bitrate_limits"
-                          << " (min=" << encoder_bitrate_limits->min_bitrate_bps
-                          << ", max=" << encoder_bitrate_limits->max_bitrate_bps
-                          << ")";
-
       if (streams.size() == 1 && encoder_config_.simulcast_layers.size() == 1) {
         // Bitrate limits can be set by app (in SDP or RtpEncodingParameters)
         // or/and can be provided by encoder. In presence of both set of
@@ -1014,15 +1009,11 @@ void VideoStreamEncoder::ReconfigureEncoder() {
         }
 
         if (min_bitrate_bps < max_bitrate_bps) {
-#if !defined(NDEBUG)
-          RTC_LOG(LS_ERROR)
-              << "Using encoder_bitrate_limits for min, max bitrate control";
           streams.back().min_bitrate_bps = min_bitrate_bps;
           streams.back().max_bitrate_bps = max_bitrate_bps;
           streams.back().target_bitrate_bps =
               std::min(streams.back().target_bitrate_bps,
                        encoder_bitrate_limits->max_bitrate_bps);
-#endif
         } else {
           RTC_LOG(LS_WARNING)
               << "Bitrate limits provided by encoder"
@@ -1036,14 +1027,6 @@ void VideoStreamEncoder::ReconfigureEncoder() {
       }
     }
   }
-
-  // FIXME: use const value to set min, max & target bitrate for now.
-#if defined(NDEBUG)
-  RTC_LOG(LS_ERROR) << "Using const value for min, max bitrate control";
-  streams.back().min_bitrate_bps = 3 * 1000 * 1000;
-  streams.back().max_bitrate_bps = 4 * 1000 * 1000;
-  streams.back().target_bitrate_bps = 3 * 1000 * 1000;
-#endif
 
   ApplyEncoderBitrateLimitsIfSingleActiveStream(
       GetEncoderInfoWithBitrateLimitUpdate(
@@ -1113,11 +1096,6 @@ void VideoStreamEncoder::ReconfigureEncoder() {
   for (const auto& stream : streams) {
     max_framerate = std::max(stream.max_framerate, max_framerate);
   }
-
-  RTC_LOG(LS_ERROR) << " max_framerate=" << max_framerate
-                    << " minBitRate=" << codec.minBitrate
-                    << " maxBitRate=" << codec.maxBitrate
-                    << " startBitRate=" << codec.startBitrate;
 
   // The resolutions that we're actually encoding with.
   std::vector<rtc::VideoSinkWants::FrameSize> encoder_resolutions;
