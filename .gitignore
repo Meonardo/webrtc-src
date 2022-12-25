@@ -72,3 +72,6 @@
 /xcodebuild
 /.vscode
 !webrtc/*
+out-debug/
+out-release/
+out/
