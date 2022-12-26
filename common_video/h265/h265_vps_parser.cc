@@ -8,22 +8,15 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+#include "common_video/h265/h265_vps_parser.h"
+
 #include <memory>
 #include <vector>
 
 #include "common_video/h265/h265_common.h"
-#include "common_video/h265/h265_vps_parser.h"
 #include "rtc_base/bit_buffer.h"
+#include "rtc_base/bitstream_reader.h"
 #include "rtc_base/logging.h"
-
-namespace {
-typedef absl::optional<webrtc::H265VpsParser::VpsState> OptionalVps;
-
-#define RETURN_EMPTY_ON_FAIL(x) \
-  if (!(x)) {                   \
-    return OptionalVps();       \
-  }
-}  // namespace
 
 namespace webrtc {
 
@@ -37,24 +30,22 @@ H265VpsParser::VpsState::VpsState() = default;
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     const uint8_t* data,
     size_t length) {
-  std::vector<uint8_t> unpacked_buffer = H265::ParseRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
-  return ParseInternal(&bit_buffer);
+  return ParseInternal(H265::ParseRbsp(data, length));
 }
 
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseInternal(
-    rtc::BitBuffer* buffer) {
+    rtc::ArrayView<const uint8_t> buffer) {
+  BitstreamReader reader(buffer);
+
   // Now, we need to use a bit buffer to parse through the actual HEVC VPS
   // format. See Section 7.3.2.1 ("Video parameter set RBSP syntax") of the
   // H.265 standard for a complete description.
-
   VpsState vps;
 
   // vps_video_parameter_set_id: u(4)
-  vps.id = 0;
-  RETURN_EMPTY_ON_FAIL(buffer->ReadBits(&vps.id, 4));
+  vps.id = reader.Read<uint32_t>();
 
-  return OptionalVps(vps);
+  return vps;
 }
 
 }  // namespace webrtc
