@@ -108,12 +108,12 @@ void VideoEncoderConfig::EncoderSpecificSettings::FillEncoderSpecificSettings(
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecH264(
     VideoCodecH264* h264_settings) const {
-  RTC_NOTREACHED();
+  RTC_DCHECK_NOTREACHED();
 }
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecH265(
     VideoCodecH265* h265_settings) const {
-  RTC_NOTREACHED();
+  RTC_DCHECK_NOTREACHED();
 }
 
 void VideoEncoderConfig::EncoderSpecificSettings::FillVideoCodecVp8(

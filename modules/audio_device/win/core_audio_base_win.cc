@@ -13,14 +13,14 @@
 #include <memory>
 #include <string>
 
-#include "modules/audio_device/include/audio_device.h"
 #include "modules/audio_device/audio_device_buffer.h"
+#include "modules/audio_device/include/audio_device.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
-#include "rtc_base/string_utils.h"
 #include "rtc_base/numerics/safe_conversions.h"
 #include "rtc_base/platform_thread.h"
+#include "rtc_base/string_utils.h"
 #include "rtc_base/time_utils.h"
 #include "rtc_base/win/scoped_com_initializer.h"
 #include "rtc_base/win/windows_version.h"
@@ -184,8 +184,8 @@ CoreAudioBase::CoreAudioBase(Direction direction,
 
   enumerator_ = core_audio_utility::CreateDeviceEnumerator();
   enumerator_->RegisterEndpointNotificationCallback(this);
-  RTC_LOG(INFO) << __FUNCTION__
-                << ":Registered endpoint notification callback.";
+  RTC_LOG(LS_INFO) << __FUNCTION__
+                   << ":Registered endpoint notification callback.";
 }
 
 CoreAudioBase::~CoreAudioBase() {
@@ -897,8 +897,7 @@ HRESULT __stdcall CoreAudioBase::OnDefaultDeviceChanged(
 
   if (audio_device_sink_ != nullptr)
     audio_device_sink_->OnDevicesChanged(AudioDeviceSink::kDefaultChanged,
-                                         device_type,
-                                device_id.c_str());
+                                         device_type, device_id.c_str());
   return S_OK;
 }
 
