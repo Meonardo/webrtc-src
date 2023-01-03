@@ -75,13 +75,12 @@ HistogramCodecType PayloadNameToHistogramCodecType(
       return kVideoVp9;
     case kVideoCodecH264:
       return kVideoH264;
-<<<<<<< HEAD
     case kVideoCodecAV1:
       return kVideoAv1;
-    == == == = case kVideoCodecH265:
+    case kVideoCodecH265:
       return kVideoH265;
->>>>>>> fd95909ddc (Add H.265 codec Support.)
-      default: return kVideoUnknown;
+    default:
+      return kVideoUnknown;
   }
 }
 
