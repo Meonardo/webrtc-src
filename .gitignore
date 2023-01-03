@@ -70,6 +70,9 @@
 /rtc_tools/testing/browsertest/*
 /x86-generic_out/
 /xcodebuild
+/out-debug
+/out-release
+/libwebrtc
 /.vscode
 !webrtc/*
 out-debug/
