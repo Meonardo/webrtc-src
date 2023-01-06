@@ -180,6 +180,12 @@ HRESULT WgcCaptureSession::StartCapture() {
     return hr;
   }
 
+  // disable yellow border
+  // session_.As(&session3_);
+  // if (session3_) {
+  //   session3_->put_IsCursorCaptureEnabled(false);
+  // }
+
   hr = session_->StartCapture();
   if (FAILED(hr)) {
     RTC_LOG(LS_ERROR) << "Failed to start CaptureSession: " << hr;
