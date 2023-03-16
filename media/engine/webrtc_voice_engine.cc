@@ -394,7 +394,7 @@ void WebRtcVoiceEngine::Init() {
   {
     AudioOptions options;
     options.echo_cancellation = true;
-    options.auto_gain_control = true;
+    options.auto_gain_control = false;
 #if defined(WEBRTC_IOS)
     // On iOS, VPIO provides built-in NS.
     options.noise_suppression = false;
