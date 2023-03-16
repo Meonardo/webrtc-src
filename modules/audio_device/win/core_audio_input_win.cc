@@ -227,6 +227,24 @@ int CoreAudioInput::VolumeIsAvailable(bool* available) {
   return IsVolumeControlAvailable(available) ? 0 : -1;
 }
 
+int32_t CoreAudioInput::SetVolume(uint32_t volume) {
+  bool available = false;
+  VolumeIsAvailable(&available);
+  if (!available) {
+    return -1;
+  }
+  return SetMicrophoneVolume(volume) ? 0 : -1;
+}
+
+int32_t CoreAudioInput::Volume(uint32_t* volume) const {
+  bool available = false;
+  IsVolumeControlAvailable(&available);
+  if (!available) {
+    return -1;
+  }
+  return MicrophoneVolume(volume) ? 0 : -1;
+}
+
 // Triggers the restart sequence. Only used for testing purposes to emulate
 // a real event where e.g. an active input device is removed.
 int CoreAudioInput::RestartRecording() {

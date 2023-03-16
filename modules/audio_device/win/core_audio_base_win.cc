@@ -13,14 +13,14 @@
 #include <memory>
 #include <string>
 
-#include "modules/audio_device/include/audio_device.h"
 #include "modules/audio_device/audio_device_buffer.h"
+#include "modules/audio_device/include/audio_device.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/checks.h"
 #include "rtc_base/logging.h"
-#include "rtc_base/string_utils.h"
 #include "rtc_base/numerics/safe_conversions.h"
 #include "rtc_base/platform_thread.h"
+#include "rtc_base/string_utils.h"
 #include "rtc_base/time_utils.h"
 #include "rtc_base/win/scoped_com_initializer.h"
 #include "rtc_base/win/windows_version.h"
@@ -678,6 +678,53 @@ bool CoreAudioBase::IsVolumeControlAvailable(bool* available) const {
   return false;
 }
 
+bool CoreAudioBase::SetMicrophoneVolume(uint32_t volume) {
+  if (!audio_client_) {
+    return false;
+  }
+
+  // Try to create an ISimpleAudioVolume instance.
+  ComPtr<ISimpleAudioVolume> audio_volume =
+      core_audio_utility::CreateSimpleAudioVolume(audio_client_.Get());
+  if (!audio_volume.Get()) {
+    RTC_DLOG(LS_ERROR) << "Volume control is not supported";
+    return false;
+  }
+
+  const float fLevel = static_cast<float>(volume) / 255.0;
+  audio_volume->SetMasterVolume(fLevel, NULL);
+
+  return false;
+}
+
+bool CoreAudioBase::MicrophoneVolume(uint32_t* v) const {
+  if (!audio_client_) {
+    return false;
+  }
+
+  // Try to create an ISimpleAudioVolume instance.
+  ComPtr<ISimpleAudioVolume> audio_volume =
+      core_audio_utility::CreateSimpleAudioVolume(audio_client_.Get());
+  if (!audio_volume.Get()) {
+    RTC_DLOG(LS_ERROR) << "Volume control is not supported";
+    return false;
+  }
+
+  // Try to use the valid volume control.
+  float volume = 0.0;
+  _com_error error = audio_volume->GetMasterVolume(&volume);
+  if (error.Error() != S_OK) {
+    RTC_LOG(LS_ERROR) << "ISimpleAudioVolume::GetMasterVolume failed: "
+                      << core_audio_utility::ErrorToString(error);
+    return false;
+  }
+  RTC_DLOG(LS_INFO) << "master volume for input audio session: " << volume;
+  // scale input volume range [0.0,1.0] to valid output range
+  *v = static_cast<uint32_t>(volume * 255.0);
+
+  return false;
+}
+
 // Internal test method which can be used in tests to emulate a restart signal.
 // It simply sets the same event which is normally triggered by session and
 // device notifications. Hence, the emulated restart sequence covers most parts
@@ -897,8 +944,7 @@ HRESULT __stdcall CoreAudioBase::OnDefaultDeviceChanged(
 
   if (audio_device_sink_ != nullptr)
     audio_device_sink_->OnDevicesChanged(AudioDeviceSink::kDefaultChanged,
-                                         device_type,
-                                device_id.c_str());
+                                         device_type, device_id.c_str());
   return S_OK;
 }
 

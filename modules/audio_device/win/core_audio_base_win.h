@@ -98,6 +98,8 @@ class CoreAudioBase : public IAudioSessionEvents, public IMMNotificationClient {
   bool Start();
   bool Stop();
   bool IsVolumeControlAvailable(bool* available) const;
+  bool SetMicrophoneVolume(uint32_t volume);
+  bool MicrophoneVolume(uint32_t* volume) const;
   bool Restart();
 
   Direction direction() const { return direction_; }

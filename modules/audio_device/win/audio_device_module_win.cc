@@ -172,7 +172,7 @@ class WindowsAudioDeviceModule : public AudioDeviceModuleForTest {
   }
 
   int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) const override {
-    //input_->SetAudioDeviceSink(sink);
+    // input_->SetAudioDeviceSink(sink);
     output_->SetAudioDeviceSink(sink);
     return 0;
   }
@@ -385,12 +385,17 @@ class WindowsAudioDeviceModule : public AudioDeviceModuleForTest {
     // TODO(henrika): improve support.
     RTC_DLOG(LS_INFO) << __FUNCTION__;
     RTC_DCHECK_RUN_ON(&thread_checker_);
-    *available = false;
-    return 0;
+
+    return input_->VolumeIsAvailable(available);
   }
 
-  int32_t SetMicrophoneVolume(uint32_t volume) override { return 0; }
-  int32_t MicrophoneVolume(uint32_t* volume) const override { return 0; }
+  int32_t SetMicrophoneVolume(uint32_t volume) override {
+    return input_->SetVolume(volume);
+  }
+  int32_t MicrophoneVolume(uint32_t* volume) const override {
+    return input_->Volume(volume);
+  }
+
   int32_t MaxMicrophoneVolume(uint32_t* maxVolume) const override { return 0; }
   int32_t MinMicrophoneVolume(uint32_t* minVolume) const override { return 0; }
 
