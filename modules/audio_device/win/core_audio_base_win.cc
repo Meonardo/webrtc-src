@@ -547,6 +547,14 @@ bool CoreAudioBase::Init() {
   audio_client_ = audio_client;
   audio_session_control_ = audio_session_control;
 
+  AudioDeviceSink::DeviceType device_type = AudioDeviceSink::kCapture;
+  if (direction_ == Direction::kOutput) {
+    device_type = AudioDeviceSink::kPlayout;
+  }
+  if (audio_device_sink_ != nullptr)
+    audio_device_sink_->OnDevicesChanged(AudioDeviceSink::kStateChanged,
+                                         device_type, "init");
+
   return true;
 }
 

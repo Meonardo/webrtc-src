@@ -172,7 +172,7 @@ class WindowsAudioDeviceModule : public AudioDeviceModuleForTest {
   }
 
   int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) const override {
-    // input_->SetAudioDeviceSink(sink);
+    input_->SetAudioDeviceSink(sink);
     output_->SetAudioDeviceSink(sink);
     return 0;
   }

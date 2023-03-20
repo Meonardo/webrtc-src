@@ -56,6 +56,7 @@ class CoreAudioInput final : public CoreAudioBase, public AudioInput {
 
   CoreAudioInput(const CoreAudioInput&) = delete;
   CoreAudioInput& operator=(const CoreAudioInput&) = delete;
+  int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) override;
 
  private:
   void ReleaseCOMObjects();

@@ -467,5 +467,9 @@ bool CoreAudioInput::HandleStreamDisconnected() {
   return true;
 }
 
+int32_t CoreAudioInput::SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) {
+  return CoreAudioBase::SetAudioDeviceSink1(sink);
+}
+
 }  // namespace webrtc_win
 }  // namespace webrtc
