@@ -284,10 +284,14 @@ void CoreAudioInput::ReleaseCOMObjects() {
 bool CoreAudioInput::OnDataCallback(uint64_t device_frequency) {
   RTC_DCHECK_RUN_ON(&thread_checker_audio_);
 
-  if (!initialized_ || !is_active_) {
+  if (!initialized_) {
     // This is concurrent examination of state across multiple threads so will
     // be somewhat error prone, but we should still be defensive and not use
     // audio_capture_client_ if we know it's not there.
+    if (!initialized_)
+      RTC_LOG(LS_ERROR) << "Not initialized";
+    if (!is_active_)
+      RTC_LOG(LS_ERROR) << "Not active";
     return false;
   }
   if (num_data_callbacks_ == 0) {
