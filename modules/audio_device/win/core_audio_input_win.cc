@@ -227,6 +227,24 @@ int CoreAudioInput::VolumeIsAvailable(bool* available) {
   return IsVolumeControlAvailable(available) ? 0 : -1;
 }
 
+int32_t CoreAudioInput::SetVolume(uint32_t volume) {
+  bool available = false;
+  VolumeIsAvailable(&available);
+  if (!available) {
+    return -1;
+  }
+  return SetMicrophoneVolume(volume) ? 0 : -1;
+}
+
+int32_t CoreAudioInput::Volume(uint32_t* volume) const {
+  bool available = false;
+  IsVolumeControlAvailable(&available);
+  if (!available) {
+    return -1;
+  }
+  return MicrophoneVolume(volume) ? 0 : -1;
+}
+
 // Triggers the restart sequence. Only used for testing purposes to emulate
 // a real event where e.g. an active input device is removed.
 int CoreAudioInput::RestartRecording() {
@@ -266,10 +284,14 @@ void CoreAudioInput::ReleaseCOMObjects() {
 bool CoreAudioInput::OnDataCallback(uint64_t device_frequency) {
   RTC_DCHECK_RUN_ON(&thread_checker_audio_);
 
-  if (!initialized_ || !is_active_) {
+  if (!initialized_) {
     // This is concurrent examination of state across multiple threads so will
     // be somewhat error prone, but we should still be defensive and not use
     // audio_capture_client_ if we know it's not there.
+    if (!initialized_)
+      RTC_LOG(LS_ERROR) << "Not initialized";
+    if (!is_active_)
+      RTC_LOG(LS_ERROR) << "Not active";
     return false;
   }
   if (num_data_callbacks_ == 0) {
@@ -447,6 +469,10 @@ bool CoreAudioInput::HandleStreamDisconnected() {
 
   RTC_DLOG(LS_INFO) << __FUNCTION__ << " --->>>";
   return true;
+}
+
+int32_t CoreAudioInput::SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) {
+  return CoreAudioBase::SetAudioDeviceSink1(sink);
 }
 
 }  // namespace webrtc_win

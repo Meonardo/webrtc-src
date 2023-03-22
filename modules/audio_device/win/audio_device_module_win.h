@@ -43,10 +43,13 @@ class AudioInput {
   virtual int StopRecording() = 0;
   virtual bool Recording() = 0;
   virtual int VolumeIsAvailable(bool* available) = 0;
+  virtual int32_t SetVolume(uint32_t volume) = 0;
+  virtual int32_t Volume(uint32_t* volume) const = 0;
+
   virtual int RestartRecording() = 0;
   virtual bool Restarting() const = 0;
   virtual int SetSampleRate(uint32_t sample_rate) = 0;
-  //virtual int32_t SetAudioDeviceSink(AudioDeviceSink* sink) const = 0;
+  virtual int32_t SetAudioDeviceSink(AudioDeviceSink* sink) = 0;
 };
 
 // This interface represents the main output-related parts of the complete

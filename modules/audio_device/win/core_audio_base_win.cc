@@ -547,6 +547,14 @@ bool CoreAudioBase::Init() {
   audio_client_ = audio_client;
   audio_session_control_ = audio_session_control;
 
+  AudioDeviceSink::DeviceType device_type = AudioDeviceSink::kCapture;
+  if (direction_ == Direction::kOutput) {
+    device_type = AudioDeviceSink::kPlayout;
+  }
+  if (audio_device_sink_ != nullptr)
+    audio_device_sink_->OnDevicesChanged(AudioDeviceSink::kStateChanged,
+                                         device_type, "init");
+
   return true;
 }
 
@@ -675,6 +683,53 @@ bool CoreAudioBase::IsVolumeControlAvailable(bool* available) const {
   RTC_DLOG(LS_INFO) << "master volume for output audio session: " << volume;
 
   *available = true;
+  return false;
+}
+
+bool CoreAudioBase::SetMicrophoneVolume(uint32_t volume) {
+  if (!audio_client_) {
+    return false;
+  }
+
+  // Try to create an ISimpleAudioVolume instance.
+  ComPtr<ISimpleAudioVolume> audio_volume =
+      core_audio_utility::CreateSimpleAudioVolume(audio_client_.Get());
+  if (!audio_volume.Get()) {
+    RTC_DLOG(LS_ERROR) << "Volume control is not supported";
+    return false;
+  }
+
+  const float fLevel = static_cast<float>(volume) / 255.0;
+  audio_volume->SetMasterVolume(fLevel, NULL);
+
+  return false;
+}
+
+bool CoreAudioBase::MicrophoneVolume(uint32_t* v) const {
+  if (!audio_client_) {
+    return false;
+  }
+
+  // Try to create an ISimpleAudioVolume instance.
+  ComPtr<ISimpleAudioVolume> audio_volume =
+      core_audio_utility::CreateSimpleAudioVolume(audio_client_.Get());
+  if (!audio_volume.Get()) {
+    RTC_DLOG(LS_ERROR) << "Volume control is not supported";
+    return false;
+  }
+
+  // Try to use the valid volume control.
+  float volume = 0.0;
+  _com_error error = audio_volume->GetMasterVolume(&volume);
+  if (error.Error() != S_OK) {
+    RTC_LOG(LS_ERROR) << "ISimpleAudioVolume::GetMasterVolume failed: "
+                      << core_audio_utility::ErrorToString(error);
+    return false;
+  }
+  RTC_DLOG(LS_INFO) << "master volume for input audio session: " << volume;
+  // scale input volume range [0.0,1.0] to valid output range
+  *v = static_cast<uint32_t>(volume * 255.0);
+
   return false;
 }
 

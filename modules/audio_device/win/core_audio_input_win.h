@@ -47,12 +47,16 @@ class CoreAudioInput final : public CoreAudioBase, public AudioInput {
   int StopRecording() override;
   bool Recording() override;
   int VolumeIsAvailable(bool* available) override;
+  int32_t SetVolume(uint32_t volume) override;
+  int32_t Volume(uint32_t* volume) const override;
+
   int RestartRecording() override;
   bool Restarting() const override;
   int SetSampleRate(uint32_t sample_rate) override;
 
   CoreAudioInput(const CoreAudioInput&) = delete;
   CoreAudioInput& operator=(const CoreAudioInput&) = delete;
+  int32_t SetAudioDeviceSink(webrtc::AudioDeviceSink* sink) override;
 
  private:
   void ReleaseCOMObjects();
