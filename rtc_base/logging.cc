@@ -83,6 +83,51 @@ webrtc::Mutex& GetLoggingLock() {
 
 }  // namespace
 
+std::string GetLoggingSeverityTypeString(LoggingSeverity severity) {
+  switch (severity) {
+    case rtc::LS_VERBOSE:
+      return "[VERBOSE]";
+    case rtc::LS_INFO:
+      return "[INFO]";
+    case rtc::LS_WARNING:
+      return "[WARNING]";
+    case rtc::LS_ERROR:
+      return "[ERROR]";
+    case rtc::LS_NONE:
+      return "[NONE]";
+    default:
+      break;
+  }
+  return "[NONE]";
+}
+
+#if _WIN32
+#include <time.h>
+#include <windows.h>
+std::string GetSystemTimeString() {
+  SYSTEMTIME sys;
+  GetLocalTime(&sys);
+  char tmp[64] = {NULL};
+  sprintf(tmp, "[%4d-%02d-%02d %02d:%02d:%02d %03d]", sys.wYear, sys.wMonth,
+          sys.wDay, sys.wHour, sys.wMinute, sys.wSecond, sys.wMilliseconds);
+  return std::string(tmp);
+}
+#else
+#include <sys/time.h>
+#include <unistd.h>
+char* GetSystemTimeString() {
+  struct timeval now_time;
+  gettimeofday(&now_time, NULL);
+  time_t tt = now_time.tv_sec;
+  tm* temp = localtime(&tt);
+  char time_str[32] = {NULL};
+  sprintf(time_str, "[%04d-%02d-%02d%02d:%02d:%02d]", temp->tm_year + 1900,
+          temp->tm_mon + 1, temp->tm_mday, temp->tm_hour, temp->tm_min,
+          temp->tm_sec);
+  return time_str;
+}
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // LogMessage
 /////////////////////////////////////////////////////////////////////////////
@@ -135,7 +180,9 @@ LogMessage::LogMessage(const char* file,
     tag_ = FilenameFromPath(file);
     print_stream_ << "(line " << line << "): ";
 #else
-    print_stream_ << "(" << FilenameFromPath(file) << ":" << line << "): ";
+    // print_stream_ << "(" << FilenameFromPath(file) << ":" << line << "): ";
+    print_stream_ << GetLoggingSeverityTypeString(sev) << GetSystemTimeString()
+                  << "[" << FilenameFromPath(file) << ":" << line << "]: ";
 #endif
   }
 
