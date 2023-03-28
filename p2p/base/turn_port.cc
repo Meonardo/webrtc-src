@@ -835,8 +835,8 @@ void TurnPort::OnSendStunPacket(const void* data,
   options.info_signaled_after_sent.packet_type = rtc::PacketType::kTurnMessage;
   CopyPortInformationToPacketInfo(&options.info_signaled_after_sent);
   if (Send(data, size, options) < 0) {
-    RTC_LOG(LS_ERROR) << ToString() << ": Failed to send TURN message, error: "
-                      << socket_->GetError();
+    RTC_LOG(LS_INFO) << ToString() << ": Failed to send TURN message, error: "
+                     << socket_->GetError();
   }
 }
 
