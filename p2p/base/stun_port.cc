@@ -301,10 +301,10 @@ int UDPPort::SendTo(const void* data,
     // TODO(webrtc:9622): Use general rate limiting mechanism once it exists.
     if (send_error_count_ < kSendErrorLogLimit) {
       ++send_error_count_;
-      RTC_LOG(LS_ERROR) << ToString() << ": UDP send of " << size
-                        << " bytes to host " << addr.ToSensitiveString() << " ("
-                        << addr.ToResolvedSensitiveString()
-                        << ") failed with error " << error_;
+      RTC_LOG(LS_INFO) << ToString() << ": UDP send of " << size
+                       << " bytes to host " << addr.ToSensitiveString() << " ("
+                       << addr.ToResolvedSensitiveString()
+                       << ") failed with error " << error_;
     }
   } else {
     send_error_count_ = 0;
@@ -593,7 +593,7 @@ void UDPPort::OnSendPacket(const void* data, size_t size, StunRequest* req) {
   options.info_signaled_after_sent.packet_type = rtc::PacketType::kStunMessage;
   CopyPortInformationToPacketInfo(&options.info_signaled_after_sent);
   if (socket_->SendTo(data, size, sreq->server_addr(), options) < 0) {
-    RTC_LOG_ERR_EX(LS_ERROR, socket_->GetError())
+    RTC_LOG_ERR_EX(LS_INFO, socket_->GetError())
         << "UDP send of " << size << " bytes to host "
         << sreq->server_addr().ToSensitiveString() << " ("
         << sreq->server_addr().ToResolvedSensitiveString()
