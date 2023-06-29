@@ -112,6 +112,10 @@ class WebRtcVideoEngine : public VideoEngineInterface {
   std::vector<VideoCodec> recv_codecs() const override {
     return recv_codecs(true);
   }
+
+  webrtc::VideoEncoderFactory* encoder_factory() override;
+  webrtc::VideoDecoderFactory* decoder_factory() override;
+
   std::vector<VideoCodec> send_codecs(bool include_rtx) const override;
   std::vector<VideoCodec> recv_codecs(bool include_rtx) const override;
   std::vector<webrtc::RtpHeaderExtensionCapability> GetRtpHeaderExtensions()
@@ -256,6 +260,7 @@ class WebRtcVideoChannel : public VideoMediaChannel,
       override;
   void StartReceive(uint32_t ssrc) override;
   void StopReceive(uint32_t ssrc) override;
+
  private:
   class WebRtcVideoReceiveStream;
 
@@ -502,7 +507,7 @@ class WebRtcVideoChannel : public VideoMediaChannel,
     void SetDepacketizerToDecoderFrameTransformer(
         rtc::scoped_refptr<webrtc::FrameTransformerInterface>
             frame_transformer);
-    
+
     void StartStream();
     void StopStream();
 

@@ -33,6 +33,8 @@ class AudioDeviceModule;
 class AudioMixer;
 class AudioProcessing;
 class Call;
+class VideoEncoderFactory;
+class VideoDecoderFactory;
 }  // namespace webrtc
 
 namespace cricket {
@@ -117,6 +119,8 @@ class VideoEngineInterface : public RtpHeaderExtensionQueryInterface {
   // Retrieve list of supported codecs.
   virtual std::vector<VideoCodec> send_codecs() const = 0;
   virtual std::vector<VideoCodec> recv_codecs() const = 0;
+  virtual webrtc::VideoEncoderFactory* encoder_factory() = 0;
+  virtual webrtc::VideoDecoderFactory* decoder_factory() = 0;
   // As above, but if include_rtx is false, don't include RTX codecs.
   // TODO(bugs.webrtc.org/13931): Remove default implementation once
   // upstream subclasses have converted.

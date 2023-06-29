@@ -666,6 +666,14 @@ std::vector<VideoCodec> WebRtcVideoEngine::recv_codecs(bool include_rtx) const {
                                          include_rtx, trials_);
 }
 
+webrtc::VideoEncoderFactory* WebRtcVideoEngine::encoder_factory() {
+  return encoder_factory_.get();
+}
+
+webrtc::VideoDecoderFactory* WebRtcVideoEngine::decoder_factory() {
+  return decoder_factory_.get();
+}
+
 std::vector<webrtc::RtpHeaderExtensionCapability>
 WebRtcVideoEngine::GetRtpHeaderExtensions() const {
   std::vector<webrtc::RtpHeaderExtensionCapability> result;
