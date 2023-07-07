@@ -142,6 +142,7 @@ class PeerConnection : public PeerConnectionInternal,
   RTCErrorOr<rtc::scoped_refptr<RtpTransceiverInterface>> AddTransceiver(
       cricket::MediaType media_type,
       const RtpTransceiverInit& init) override;
+  bool RemoveTransceiver(const std::string& mid) override;
 
   rtc::scoped_refptr<RtpSenderInterface> CreateSender(
       const std::string& kind,
@@ -260,9 +261,7 @@ class PeerConnection : public PeerConnectionInternal,
   }
   rtc::Thread* worker_thread() const final { return context_->worker_thread(); }
 
-  std::string session_id() const override {
-    return session_id_;
-  }
+  std::string session_id() const override { return session_id_; }
 
   bool initial_offerer() const override {
     RTC_DCHECK_RUN_ON(signaling_thread());

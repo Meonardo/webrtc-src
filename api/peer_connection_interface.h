@@ -866,6 +866,9 @@ class RTC_EXPORT PeerConnectionInterface : public rtc::RefCountInterface {
   AddTransceiver(cricket::MediaType media_type,
                  const RtpTransceiverInit& init) = 0;
 
+  // Remove the transceiver according to the track
+  virtual bool RemoveTransceiver(const std::string& mid) = 0;
+
   // Creates a sender without a track. Can be used for "early media"/"warmup"
   // use cases, where the application may want to negotiate video attributes
   // before a track is available to send.
