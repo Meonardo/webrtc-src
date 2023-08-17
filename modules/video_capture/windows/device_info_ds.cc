@@ -171,11 +171,10 @@ int32_t DeviceInfoDS::GetDeviceInfo(uint32_t deviceNumber,
             if (deviceUniqueIdUTF8Length > 0) {
               hr = pBag->Read(L"DevicePath", &varName, 0);
               if (FAILED(hr)) {
-                strncpy_s((char*)deviceUniqueIdUTF8, deviceUniqueIdUTF8Length,
-                          (char*)deviceNameUTF8, convResult);
+                /*strncpy_s((char*)deviceUniqueIdUTF8, deviceUniqueIdUTF8Length,
+                          (char*)deviceNameUTF8, convResult);*/
                 RTC_LOG(LS_INFO) << "Failed to get "
-                                    "deviceUniqueIdUTF8 using "
-                                    "deviceNameUTF8";
+                                    "deviceUniqueIdUTF8";
               } else {
                 convResult = WideCharToMultiByte(
                     CP_UTF8, 0, varName.bstrVal, -1, (char*)deviceUniqueIdUTF8,
