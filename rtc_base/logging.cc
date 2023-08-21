@@ -95,6 +95,8 @@ std::string GetLoggingSeverityTypeString(LoggingSeverity severity) {
       return "[ERROR]";
     case rtc::LS_NONE:
       return "[NONE]";
+    case rtc::LS_APP:
+      return "[APP]";
     default:
       break;
   }

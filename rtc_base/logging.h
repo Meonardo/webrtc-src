@@ -87,6 +87,7 @@ enum LoggingSeverity {
   LS_WARNING,
   LS_ERROR,
   LS_NONE,
+  LS_APP,
 };
 
 // LogErrorContext assists in interpreting the meaning of an error value.
