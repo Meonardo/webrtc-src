@@ -20,6 +20,15 @@
 namespace webrtc {
 namespace videocapturemodule {
 
+static char* dup_wchar_to_utf8(wchar_t* w) {
+  char* s = NULL;
+  int l = WideCharToMultiByte(CP_UTF8, 0, w, -1, 0, 0, 0, 0);
+  s = (char*)malloc(l);
+  if (s)
+    WideCharToMultiByte(CP_UTF8, 0, w, -1, s, l, 0, 0);
+  return s;
+}
+
 // static
 DeviceInfoDS* DeviceInfoDS::Create() {
   DeviceInfoDS* dsInfo = new DeviceInfoDS();
@@ -102,6 +111,37 @@ uint32_t DeviceInfoDS::NumberOfDevices() {
   return GetDeviceInfo(0, 0, 0, 0, 0, 0, 0);
 }
 
+// copy from https://github.com/FFmpeg/FFmpeg/blob/c1b6235d4158b3771e2a2ee7d5754477df7edc59/libavdevice/dshow.c#L508-L509
+bool DeviceInfoDS::GetDeviceDisplayName(IMoniker* m,
+                                      char* deviceUniqueIdUTF8,
+                                      uint32_t deviceUniqueIdUTF8Length) {
+  IBindCtx* bind_ctx = nullptr;
+  LPOLESTR olestr = nullptr;
+  auto hr = CreateBindCtx(0, &bind_ctx);
+  if (hr == S_OK) {
+    /* GetDisplayname works for both video and audio, DevicePath
+     * doesn't */
+    hr = m->GetDisplayName(bind_ctx, nullptr, &olestr);
+    if (hr == S_OK) {
+      auto unique_name = dup_wchar_to_utf8(olestr);
+      /* replace ':' with '_' since we use : to delineate between
+       * sources */
+      for (size_t i = 0; i < strlen(unique_name); i++) {
+        if (unique_name[i] == ':')
+          unique_name[i] = '_';
+      }
+      strcpy_s(deviceUniqueIdUTF8, deviceUniqueIdUTF8Length,
+               unique_name);
+      // release resource
+      bind_ctx->Release();
+      free(unique_name);
+
+      return true;
+    }
+  }
+  return false;
+}
+
 int32_t DeviceInfoDS::GetDeviceName(uint32_t deviceNumber,
                                     char* deviceNameUTF8,
                                     uint32_t deviceNameLength,
@@ -175,6 +215,12 @@ int32_t DeviceInfoDS::GetDeviceInfo(uint32_t deviceNumber,
                           (char*)deviceNameUTF8, convResult);*/
                 RTC_LOG(LS_INFO) << "Failed to get "
                                     "deviceUniqueIdUTF8";
+                if (GetDeviceDisplayName(pM, deviceUniqueIdUTF8, deviceUniqueIdUTF8Length)) {
+                  if (productUniqueIdUTF8 && productUniqueIdUTF8Length > 0) {
+                    GetProductId(deviceUniqueIdUTF8, productUniqueIdUTF8,
+                                 productUniqueIdUTF8Length);
+                  }
+                }
               } else {
                 convResult = WideCharToMultiByte(
                     CP_UTF8, 0, varName.bstrVal, -1, (char*)deviceUniqueIdUTF8,
@@ -240,12 +286,12 @@ IBaseFilter* DeviceInfoDS::GetDeviceFilter(const char* deviceUniqueIdUTF8,
       VariantInit(&varName);
       if (deviceUniqueIdUTF8Length > 0) {
         hr = pBag->Read(L"DevicePath", &varName, 0);
-        if (FAILED(hr)) {
-          hr = pBag->Read(L"Description", &varName, 0);
-          if (FAILED(hr)) {
-            hr = pBag->Read(L"FriendlyName", &varName, 0);
-          }
-        }
+        // if (FAILED(hr)) {
+        //   hr = pBag->Read(L"Description", &varName, 0);
+        //   if (FAILED(hr)) {
+        //     hr = pBag->Read(L"FriendlyName", &varName, 0);
+        //   }
+        // }
         if (SUCCEEDED(hr)) {
           char tempDevicePathUTF8[256];
           tempDevicePathUTF8[0] = 0;
@@ -258,18 +304,40 @@ IBaseFilter* DeviceInfoDS::GetDeviceFilter(const char* deviceUniqueIdUTF8,
             deviceFound = true;
             hr =
                 pM->BindToObject(0, 0, IID_IBaseFilter, (void**)&captureFilter);
-            if
-              FAILED(hr) {
-                RTC_LOG(LS_ERROR) << "Failed to bind to the selected "
-                                     "capture device "
-                                  << hr;
-              }
+            if FAILED (hr) {
+              RTC_LOG(LS_ERROR) << "Failed to bind to the selected "
+                                   "capture device "
+                                << hr;
+            }
 
             if (productUniqueIdUTF8 &&
                 productUniqueIdUTF8Length > 0)  // Get the device name
             {
               GetProductId(deviceUniqueIdUTF8, productUniqueIdUTF8,
                            productUniqueIdUTF8Length);
+            }
+          }
+        } else {
+          char tempDevicePathUTF8[256] = {0};
+          if (GetDeviceDisplayName(pM, tempDevicePathUTF8, 256)) {
+            if (strncmp(tempDevicePathUTF8, (const char*)deviceUniqueIdUTF8,
+                        deviceUniqueIdUTF8Length) == 0) {
+              // We have found the requested device
+              deviceFound = true;
+              hr = pM->BindToObject(0, 0, IID_IBaseFilter,
+                                    (void**)&captureFilter);
+              if FAILED (hr) {
+                RTC_LOG(LS_ERROR) << "Failed to bind to the selected "
+                                     "capture device "
+                                  << hr;
+              }
+
+              if (productUniqueIdUTF8 &&
+                  productUniqueIdUTF8Length > 0)  // Get the device name
+              {
+                GetProductId(deviceUniqueIdUTF8, productUniqueIdUTF8,
+                             productUniqueIdUTF8Length);
+              }
             }
           }
         }

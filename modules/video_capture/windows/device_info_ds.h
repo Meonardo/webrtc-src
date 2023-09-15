@@ -93,6 +93,10 @@ class DeviceInfoDS : public DeviceInfoImpl {
   IEnumMoniker* _dsMonikerDevEnum;
   bool _CoUninitializeIsRequired;
   std::vector<VideoCaptureCapabilityWindows> _captureCapabilitiesWindows;
+
+  bool GetDeviceDisplayName(IMoniker* m,
+                            char* deviceUniqueIdUTF8,
+                            uint32_t deviceUniqueIdUTF8Length);
 };
 }  // namespace videocapturemodule
 }  // namespace webrtc
