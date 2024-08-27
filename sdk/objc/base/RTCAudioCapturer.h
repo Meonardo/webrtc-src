@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+
 #import "RTCMacros.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -6,13 +7,12 @@ NS_ASSUME_NONNULL_BEGIN
 @class RTC_OBJC_TYPE(RTCAudioCapturer);
 
 RTC_OBJC_EXPORT
-@protocol RTC_OBJC_TYPE(RTCAudioCapturerDelegate)<NSObject> 
-- (void)capturer:(RTC_OBJC_TYPE(RTCAudioCapturer) *)capturer
-    didCaptureAudioFrame:(void *)frame
-          withSampleRate:(NSUInteger)sampleRate
-          bitsPerSample:(NSUInteger)bitsPerSample
-        numberOfChannels:(NSUInteger)numberOfChannels
-          numberOfFrames:(NSUInteger)numberOfFrames;
+@protocol RTC_OBJC_TYPE
+(RTCAudioCapturerDelegate)<NSObject> -
+    (void)capturer : (RTC_OBJC_TYPE(RTCAudioCapturer) *)capturer didCaptureAudioFrame
+    : (void *)frame withSampleRate : (NSUInteger)sampleRate bitsPerSample
+    : (NSUInteger)bitsPerSample numberOfChannels : (NSUInteger)numberOfChannels numberOfFrames
+    : (NSUInteger)numberOfFrames;
 @end
 
 RTC_OBJC_EXPORT

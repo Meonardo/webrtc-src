@@ -98,6 +98,9 @@ RTC_OBJC_EXPORT
 - (RTC_OBJC_TYPE(RTCAudioTrack) *)audioTrackWithSource:(RTC_OBJC_TYPE(RTCAudioSource) *)source
                                                trackId:(NSString *)trackId;
 
+/** Initialize an RTCAudioTrack with a source and an id. */
+- (RTC_OBJC_TYPE(RTCAudioTrack) *)audioTrackWithBufferSource:(RTC_OBJC_TYPE(RTCAudioBufferSource) *)source trackId:(NSString *)trackId;
+
 /** Initialize a generic RTCVideoSource. The RTCVideoSource should be
  * passed to a RTCVideoCapturer implementation, e.g.
  * RTCCameraVideoCapturer, in order to produce frames.

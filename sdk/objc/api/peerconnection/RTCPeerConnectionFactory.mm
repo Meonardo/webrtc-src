@@ -336,6 +336,11 @@
   return [[RTC_OBJC_TYPE(RTCAudioTrack) alloc] initWithFactory:self source:source trackId:trackId];
 }
 
+- (RTC_OBJC_TYPE(RTCAudioTrack) *)audioTrackWithBufferSource:(RTC_OBJC_TYPE(RTCAudioBufferSource) *)source
+                                               trackId:(NSString *)trackId {
+  return [[RTC_OBJC_TYPE(RTCAudioTrack) alloc] initWithFactory:self bufferSource:source trackId:trackId];
+}
+
 - (RTC_OBJC_TYPE(RTCVideoSource) *)videoSource {
   return [[RTC_OBJC_TYPE(RTCVideoSource) alloc] initWithFactory:self
                                                 signalingThread:_signalingThread.get()

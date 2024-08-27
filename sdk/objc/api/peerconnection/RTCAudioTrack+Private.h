@@ -16,6 +16,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RTC_OBJC_TYPE(RTCPeerConnectionFactory);
+@class RTC_OBJC_TYPE(RTCAudioBufferSource);
 @interface RTC_OBJC_TYPE (RTCAudioTrack) ()
 
 /** AudioTrackInterface created or passed in at construction. */
@@ -24,6 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 /** Initialize an RTCAudioTrack with an id. */
 - (instancetype)initWithFactory:(RTC_OBJC_TYPE(RTCPeerConnectionFactory) *)factory
                          source:(RTC_OBJC_TYPE(RTCAudioSource) *)source
+                        trackId:(NSString *)trackId;
+
+/** Initialize an RTCAudioTrack with an id. */
+- (instancetype)initWithFactory:(RTC_OBJC_TYPE(RTCPeerConnectionFactory) *)factory
+                         bufferSource:(RTC_OBJC_TYPE(RTCAudioBufferSource) *)source
                         trackId:(NSString *)trackId;
 
 - (void)didCaptureSampleBuffer:(CMSampleBufferRef)sampleBuffer;

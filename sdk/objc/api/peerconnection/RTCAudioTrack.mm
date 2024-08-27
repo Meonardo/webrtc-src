@@ -15,6 +15,7 @@
 
 #import "RTCAudioRenderer.h"
 #import "RTCAudioSource+Private.h"
+#import "RTCAudioBufferSource+Private.h"
 #import "RTCMediaStreamTrack+Private.h"
 #import "RTCPeerConnectionFactory+Private.h"
 #import "helpers/NSString+StdString.h"
@@ -200,6 +201,22 @@ class AudioSinkConverter : public rtc::RefCountInterface, public webrtc::AudioTr
       factory.nativeFactory->CreateAudioTrack(nativeId, source.nativeAudioSource.get());
   if (self = [self initWithFactory:factory nativeTrack:track type:RTCMediaStreamTrackTypeAudio]) {
     _source = source;
+  }
+  return self;
+}
+
+- (instancetype)initWithFactory:(RTC_OBJC_TYPE(RTCPeerConnectionFactory) *)factory
+                         bufferSource:(RTC_OBJC_TYPE(RTCAudioBufferSource) *)source
+                        trackId:(NSString *)trackId {
+                          RTC_DCHECK(factory);
+  RTC_DCHECK(source);
+  RTC_DCHECK(trackId.length);
+
+  std::string nativeId = [NSString stdStringForString:trackId];
+  rtc::scoped_refptr<webrtc::AudioTrackInterface> track =
+      factory.nativeFactory->CreateAudioTrack(nativeId, source.nativeAudioSource.get());
+  if (self = [self initWithFactory:factory nativeTrack:track type:RTCMediaStreamTrackTypeAudio]) {
+    // _source = source;
   }
   return self;
 }
