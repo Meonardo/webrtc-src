@@ -19,6 +19,7 @@
 #import "RTCAudioDeviceModule+Private.h"
 
 #import "RTCAudioSource+Private.h"
+#import "RTCAudioBufferSource+Private.h"
 #import "RTCAudioTrack+Private.h"
 #import "RTCMediaConstraints+Private.h"
 #import "RTCMediaStream+Private.h"
@@ -319,6 +320,10 @@
   rtc::scoped_refptr<webrtc::AudioSourceInterface> source =
       _nativeFactory->CreateAudioSource(options);
   return [[RTC_OBJC_TYPE(RTCAudioSource) alloc] initWithFactory:self nativeAudioSource:source];
+}
+
+- (RTC_OBJC_TYPE(RTCAudioBufferSource) *)audioBufferSource {
+  return [[RTC_OBJC_TYPE(RTCAudioBufferSource) alloc] initWithFactory:self];
 }
 
 - (RTC_OBJC_TYPE(RTCAudioTrack) *)audioTrackWithTrackId:(NSString *)trackId {

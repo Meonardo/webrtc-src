@@ -105,6 +105,8 @@ if (is_ios || is_mac) {
       "objc/base/RTCSSLCertificateVerifier.h",
       "objc/base/RTCVideoCapturer.h",
       "objc/base/RTCVideoCapturer.m",
+      "objc/base/RTCAudioCapturer.h",
+      "objc/base/RTCAudioCapturer.m",
       "objc/base/RTCVideoCodecInfo.h",
       "objc/base/RTCVideoCodecInfo.m",
       "objc/base/RTCVideoDecoder.h",
@@ -1000,6 +1002,9 @@ if (is_ios || is_mac) {
         "objc/api/peerconnection/RTCAudioSource+Private.h",
         "objc/api/peerconnection/RTCAudioSource.h",
         "objc/api/peerconnection/RTCAudioSource.mm",
+        "objc/api/peerconnection/RTCAudioBufferSource+Private.h",
+        "objc/api/peerconnection/RTCAudioBufferSource.h",
+        "objc/api/peerconnection/RTCAudioBufferSource.mm",
         "objc/api/peerconnection/RTCAudioTrack+Private.h",
         "objc/api/peerconnection/RTCAudioTrack.h",
         "objc/api/peerconnection/RTCAudioTrack.mm",
@@ -1371,6 +1376,7 @@ if (is_ios || is_mac) {
           "objc/base/RTCMutableYUVPlanarBuffer.h",
           "objc/base/RTCSSLCertificateVerifier.h",
           "objc/base/RTCVideoCapturer.h",
+          "objc/base/RTCAudioCapturer.h",
           "objc/base/RTCVideoCodecInfo.h",
           "objc/base/RTCVideoDecoder.h",
           "objc/base/RTCVideoDecoderFactory.h",
@@ -1406,6 +1412,7 @@ if (is_ios || is_mac) {
           "objc/api/peerconnection/RTCAudioDeviceModule.h",
           "objc/api/peerconnection/RTCIODevice.h",
           "objc/api/peerconnection/RTCAudioSource.h",
+          "objc/api/peerconnection/RTCAudioBufferSource.h",
           "objc/api/peerconnection/RTCAudioTrack.h",
           "objc/api/peerconnection/RTCConfiguration.h",
           "objc/api/peerconnection/RTCDataChannel.h",
@@ -1798,6 +1805,8 @@ if (is_ios || is_mac) {
         "objc/native/src/objc_video_renderer.mm",
         "objc/native/src/objc_video_track_source.h",
         "objc/native/src/objc_video_track_source.mm",
+        "objc/native/src/objc_audio_track_source.h",
+        "objc/native/src/objc_audio_track_source.mm",
       ]
 
       configs += [ "..:common_objc" ]

@@ -40,8 +40,8 @@ DEFAULT_ARCHS = [
     'device:arm64', 'simulator:arm64', 'simulator:x64'
 ]
 IOS_MINIMUM_DEPLOYMENT_TARGET = {
-    'device': '12.0',
-    'simulator': '12.0',
+    'device': '13.0',
+    'simulator': '13.0',
     'catalyst': '14.0'
 }
 LIBVPX_BUILD_VP9 = False
@@ -263,7 +263,7 @@ def main():
         all_lib_paths.extend(lib_paths)
 
         # Combine the slices.
-        dylib_path = os.path.join(SDK_FRAMEWORK_NAME, 'WebRTC')
+        dylib_path = os.path.join(SDK_FRAMEWORK_NAME, 'LiveKitWebRTC')
         # Dylibs will be combined, all other files are the same across archs.
         shutil.rmtree(os.path.join(framework_path, SDK_FRAMEWORK_NAME),
                       ignore_errors=True)
@@ -292,7 +292,7 @@ def main():
                             os.path.join(framework_path, SDK_DSYM_NAME))
             logging.info('Merging dSYM slices.')
             dsym_path = os.path.join(SDK_DSYM_NAME, 'Contents', 'Resources',
-                                     'DWARF', 'WebRTC')
+                                     'DWARF', 'LiveKitWebRTC')
             lib_dsym_paths = [
                 os.path.join(path, dsym_path) for path in lib_paths
             ]
