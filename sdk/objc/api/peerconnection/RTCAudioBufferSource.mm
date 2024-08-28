@@ -52,6 +52,11 @@ static webrtc::ObjcAudioTrackSource *getObjCAudioSource(
       ->OnCapturedFrame(frame, sampleRate, bitsPerSample, numberOfChannels, numberOfFrames);
 }
 
+- (void)capturer: (RTC_OBJC_TYPE(RTCAudioCapturer) *)capturer didCaptureAudioSampleBuffer
+    : (CMSampleBufferRef)sampleBuffer {
+  getObjCAudioSource(_nativeAudioSource)->OnCapturedSampleBuffer(sampleBuffer);
+}
+
 #pragma mark - Private
 
 - (rtc::scoped_refptr<webrtc::AudioSourceInterface>)nativeAudioSource {
