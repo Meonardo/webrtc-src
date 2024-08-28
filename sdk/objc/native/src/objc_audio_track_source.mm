@@ -33,6 +33,7 @@ ObjcAudioTrackSource::~ObjcAudioTrackSource() {
     });
     worker_thread_->Stop();
   }
+  RTC_LOG(LS_INFO) << "ObjcAudioTrackSource::~ObjcAudioTrackSource done";
 }
 
 void ObjcAudioTrackSource::AddSink(AudioTrackSinkInterface *sink) {
@@ -82,10 +83,9 @@ void ObjcAudioTrackSource::OnCapturedSampleBuffer(CMSampleBufferRef sampleBuffer
   }
 
   AudioBufferList audioBufferList;
-  size_t requiredSize = 0;
   auto ret = CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(
       sampleBuffer,
-      &requiredSize,
+      nullptr,
       &audioBufferList,
       sizeof(audioBufferList),
       nullptr,
