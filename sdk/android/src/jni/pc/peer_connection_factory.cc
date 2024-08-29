@@ -32,7 +32,7 @@
 #include "sdk/android/src/jni/logging/log_sink.h"
 #include "sdk/android/src/jni/pc/android_network_monitor.h"
 #include "sdk/android/src/jni/pc/audio.h"
-#include "sdk/android/src/jni/pc/rtp_capabilities.h"
+#include "sdk/android/src/jni/pc/audio_buffer_source.h"
 #include "sdk/android/src/jni/pc/ice_candidate.h"
 #include "sdk/android/src/jni/pc/media_stream_track.h"
 #include "sdk/android/src/jni/pc/owned_factory_and_threads.h"
@@ -371,6 +371,14 @@ static jlong JNI_PeerConnectionFactory_CreateAudioSource(
   return jlongFromPointer(source.release());
 }
 
+static jlong JNI_PeerConnectionFactory_CreateAudioBufferSource(
+    JNIEnv* jni,
+    jlong native_factory) {
+  rtc::scoped_refptr<webrtc::jni::AudioBufferSource> source(
+      new rtc::FinalRefCountedObject<webrtc::jni::AudioBufferSource>());
+  return jlongFromPointer(source.release());
+}
+
 jlong JNI_PeerConnectionFactory_CreateAudioTrack(
     JNIEnv* jni,
     jlong native_factory,
@@ -381,6 +389,18 @@ jlong JNI_PeerConnectionFactory_CreateAudioTrack(
           ->CreateAudioTrack(
               JavaToStdString(jni, id),
               reinterpret_cast<AudioSourceInterface*>(native_source)));
+  return jlongFromPointer(track.release());
+}
+
+jlong JNI_PeerConnectionFactory_CreateAudioTrackFromBufferSource(
+    JNIEnv* jni,
+    jlong native_factory,
+    const JavaParamRef<jstring>& id,
+    jlong native_source) {
+  auto buffer_source = reinterpret_cast<AudioBufferSource*>(native_source);
+  rtc::scoped_refptr<AudioTrackInterface> track(
+      PeerConnectionFactoryFromJava(native_factory)
+          ->CreateAudioTrack(JavaToStdString(jni, id), buffer_source));
   return jlongFromPointer(track.release());
 }
 

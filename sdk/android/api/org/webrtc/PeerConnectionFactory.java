@@ -469,9 +469,20 @@ public class PeerConnectionFactory {
     return new AudioSource(nativeCreateAudioSource(nativeFactory, constraints));
   }
 
+  public AudioBufferSource createAudioBufferSource() {
+    checkPeerConnectionFactoryExists();
+    return new AudioBufferSource(nativeCreateAudioBufferSource(nativeFactory));
+  }
+
   public AudioTrack createAudioTrack(String id, AudioSource source) {
     checkPeerConnectionFactoryExists();
     return new AudioTrack(nativeCreateAudioTrack(nativeFactory, id, source.getNativeAudioSource()));
+  }
+
+  public AudioTrack createAudioTrackFromBufferSource(String id, AudioBufferSource source) {
+    checkPeerConnectionFactoryExists();
+    return new AudioTrack(
+        nativeCreateAudioTrackFromBufferSource(nativeFactory, id, source.getNativeAudioSource()));
   }
 
   public RtpCapabilities getRtpReceiverCapabilities(MediaStreamTrack.MediaType mediaType) {
@@ -619,7 +630,9 @@ public class PeerConnectionFactory {
   private static native long nativeCreateVideoTrack(
       long factory, String id, long nativeVideoSource);
   private static native long nativeCreateAudioSource(long factory, MediaConstraints constraints);
+  private static native long nativeCreateAudioBufferSource(long factory);
   private static native long nativeCreateAudioTrack(long factory, String id, long nativeSource);
+  private static native long nativeCreateAudioTrackFromBufferSource(long factory, String id, long nativeSource);
   private static native boolean nativeStartAecDump(
       long factory, int file_descriptor, int filesize_limit_bytes);
   private static native void nativeStopAecDump(long factory);
