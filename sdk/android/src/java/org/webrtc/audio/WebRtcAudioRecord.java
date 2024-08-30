@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.webrtc.CalledByNative;
@@ -108,6 +109,9 @@ class WebRtcAudioRecord {
   private final boolean isAcousticEchoCancelerSupported;
   private final boolean isNoiseSuppressorSupported;
 
+  // default is paused
+  private AtomicBoolean paused = new AtomicBoolean(true);
+
   /**
    * Audio thread which keeps calling ByteBuffer.read() waiting for audio
    * to be recorded. Feeds recorded data to the native counterpart as a
@@ -141,6 +145,15 @@ class WebRtcAudioRecord {
           if (microphoneMute) {
             byteBuffer.clear();
             byteBuffer.put(emptyBytes);
+          }
+          if (paused.get()) {
+            // sleep for a while to reduce CPU usage
+            try {
+              Thread.sleep(100);
+            } catch (InterruptedException e) {
+              Logging.e(TAG, "AudioRecordThread sleep interrupted");
+            }
+            continue;
           }
           // It's possible we've been shut down during the read, and stopRecording() tried and
           // failed to join this thread. To be a bit safer, try to avoid calling any native methods
@@ -369,6 +382,14 @@ class WebRtcAudioRecord {
         Logging.e(TAG, "setPreferredDevice failed");
       }
     }
+  }
+
+  public void pasuseRecording() {
+    paused.set(true);
+  }
+
+  public void resumeRecording() {
+    paused.set(false);
   }
 
   @CalledByNative

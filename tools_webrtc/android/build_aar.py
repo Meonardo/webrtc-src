@@ -175,7 +175,6 @@ def Build(build_dir, arch, use_goma, use_remoteexec, extra_gn_args,
     output_directory = _GetOutputDirectory(build_dir, arch)
     gn_args = {
         'target_os': 'android',
-        'is_debug': False,
         'is_component_build': False,
         'rtc_include_tests': False,
         'target_cpu': _GetTargetCpu(arch),

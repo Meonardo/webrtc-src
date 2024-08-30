@@ -399,6 +399,14 @@ public class JavaAudioDeviceModule implements AudioDeviceModule {
     this.useStereoOutput = useStereoOutput;
   }
 
+  public void pasuseRecording() {
+    audioInput.pasuseRecording();
+  }
+
+  public void resumeRecording() {
+    audioInput.resumeRecording();
+  }
+
   @Override
   public long getNativeAudioDeviceModulePointer() {
     synchronized (nativeLock) {
