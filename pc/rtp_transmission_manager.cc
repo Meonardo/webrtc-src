@@ -313,6 +313,22 @@ RtpTransmissionManager::CreateAndAddTransceiver(
   return transceiver;
 }
 
+bool RtpTransmissionManager::RemoveTransceiverForMid(const std::string& mid) {
+  RTC_DCHECK_RUN_ON(signaling_thread());
+
+  bool ret = false;
+  for (auto transceiver : transceivers()->List()) {
+    if (mid == transceiver->mid()) {
+      transceiver->internal()->ClearChannel();
+      transceivers()->Remove(transceiver);
+      ret = true;
+      break;
+    }
+  }
+
+  return ret;
+}
+
 rtc::scoped_refptr<RtpTransceiverProxyWithInternal<RtpTransceiver>>
 RtpTransmissionManager::FindFirstTransceiverForAddedTrack(
     rtc::scoped_refptr<MediaStreamTrackInterface> track,

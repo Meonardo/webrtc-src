@@ -113,6 +113,9 @@ class RtpTransmissionManager : public RtpSenderBase::SetStreamsObserver {
       rtc::scoped_refptr<RtpReceiverProxyWithInternal<RtpReceiverInternal>>
           receiver);
 
+  // Remove the transceiver according to the track
+  bool RemoveTransceiverForMid(const std::string& mid);
+
   // Returns the first RtpTransceiver suitable for a newly added track, if such
   // transceiver is available.
   rtc::scoped_refptr<RtpTransceiverProxyWithInternal<RtpTransceiver>>

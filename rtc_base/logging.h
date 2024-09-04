@@ -659,6 +659,9 @@ class LogMessage {
 #define RTC_LOG_V(sev) \
   !::rtc::LogMessage::IsNoop(sev) && RTC_LOG_FILE_LINE(sev, __FILE__, __LINE__)
 
+#define RTC_LOG_N_LINE(sev, file, line) \
+  !rtc::LogMessage::IsNoop(sev) && RTC_LOG_FILE_LINE(sev, file, line)
+
 // The _F version prefixes the message with the current function name.
 #if (defined(__GNUC__) && !defined(NDEBUG)) || defined(WANT_PRETTY_LOG_F)
 #define RTC_LOG_F(sev) RTC_LOG(sev) << __PRETTY_FUNCTION__ << ": "

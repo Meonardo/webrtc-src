@@ -147,6 +147,7 @@ class PeerConnection : public PeerConnectionInternal,
   RTCErrorOr<rtc::scoped_refptr<RtpTransceiverInterface>> AddTransceiver(
       cricket::MediaType media_type,
       const RtpTransceiverInit& init) override;
+  bool RemoveTransceiver(const std::string& mid) override;
 
   rtc::scoped_refptr<RtpSenderInterface> CreateSender(
       const std::string& kind,

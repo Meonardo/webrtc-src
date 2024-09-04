@@ -1182,6 +1182,23 @@ PeerConnection::AddTransceiver(
   return rtc::scoped_refptr<RtpTransceiverInterface>(transceiver);
 }
 
+bool PeerConnection::RemoveTransceiver(const std::string& mid) {
+  RTC_DCHECK_RUN_ON(signaling_thread());
+  if (!ConfiguredForMedia()) {
+    RTC_LOG(LS_ERROR) << "Not configured for media";
+    return false;
+  }
+  if (IsClosed()) {
+    return false;
+  }
+  if (!IsUnifiedPlan()) {
+    RTC_LOG(LS_ERROR) << "Only support in Unified Plan";
+    return false;
+  }
+
+  return rtp_manager()->RemoveTransceiverForMid(mid);
+}
+
 void PeerConnection::OnNegotiationNeeded() {
   RTC_DCHECK_RUN_ON(signaling_thread());
   RTC_DCHECK(!IsClosed());
