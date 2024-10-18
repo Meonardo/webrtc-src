@@ -45,8 +45,107 @@
 #define V4L2_PIX_FMT_RGBA32 v4l2_fourcc('A', 'B', '2', '4')
 #endif
 
+#define FILE_PATH_MAX 1024
+
 namespace webrtc {
 namespace videocapturemodule {
+
+static int FindUsbDevice(const char* device_sysfs_path, char* vid_pid) {
+  char path[FILE_PATH_MAX] = {0};
+  char vid_path[FILE_PATH_MAX] = {0};
+  char pid_path[FILE_PATH_MAX] = {0};
+  FILE* vid_file = nullptr;
+  FILE* pid_file = nullptr;
+
+  // Start with the initial device path
+  strncpy(path, device_sysfs_path, FILE_PATH_MAX);
+
+  // Traverse up the sysfs hierarchy until we find idVendor and idProduct
+  while (1) {
+    // Ensure there's enough space in vid_path for both the resolved path and
+    // "/idVendor"
+    if (snprintf(vid_path, sizeof(vid_path), "%s/idVendor", path) >=
+        (int)sizeof(vid_path)) {
+      RTC_LOG(LS_ERROR) << "Path too long, cannot append idVendor";
+      return -1;
+    }
+
+    // Ensure there's enough space in pid_path for both the resolved path and
+    // "/idProduct"
+    if (snprintf(pid_path, sizeof(pid_path), "%s/idProduct", path) >=
+        (int)sizeof(pid_path)) {
+      RTC_LOG(LS_ERROR) << "Path too long, cannot append idProduct";
+      return -1;
+    }
+
+    // Try to open idVendor
+    vid_file = fopen(vid_path, "r");
+    pid_file = fopen(pid_path, "r");
+
+    if (vid_file && pid_file) {
+      // Read and print VID and PID
+      char vid[10], pid[10];
+      if (fgets(vid, sizeof(vid), vid_file) != nullptr &&
+          fgets(pid, sizeof(pid), pid_file) != nullptr) {
+        // Format the PID and VID into a single string
+        {
+          // trim the newline characters if exist
+          char* newline = strchr(pid, '\n');
+          if (newline) {
+            *newline = '\0';
+          }
+        }
+        {
+          // trim the newline characters if exist
+          char* newline = strchr(vid, '\n');
+          if (newline) {
+            *newline = '\0';
+          }
+        }
+
+        snprintf(vid_pid, 10, "%s:%s", vid, pid);
+      }
+
+      fclose(vid_file);
+      fclose(pid_file);
+      return 0;  // Success
+    }
+
+    // If we reach the root of sysfs, stop the search
+    if (strcmp(path, "/sys") == 0) {
+      break;
+    }
+
+    // Move up one level in the sysfs hierarchy
+    strncat(path, "/..", sizeof(path) - strlen(path) - 1);
+  }
+
+  RTC_LOG(LS_WARNING) << "idVendor and idProduct not found.";
+  return -1;  // Failed to find USB device
+}
+
+static int GetDeviceVidPid(const char* device, char* vid_pid) {
+  char sysfs_path[FILE_PATH_MAX];
+  char resolved_path[FILE_PATH_MAX];
+  memset(sysfs_path, 0, sizeof(sysfs_path));
+  memset(resolved_path, 0, sizeof(resolved_path));
+
+  // Path to the video device in /sys/class/video4linux
+  snprintf(sysfs_path, sizeof(sysfs_path), "/sys/class/video4linux/%s/device",
+           device + 5); // Skip "/dev/" prefix
+  // Resolve the symlink to the actual hardware device path
+  if (realpath(sysfs_path, resolved_path) == nullptr) {
+    RTC_LOG(LS_ERROR) << "Error resolving realpath: " << sysfs_path;
+    return -1;
+  }
+
+  // Print resolved path for debugging
+  RTC_LOG(LS_INFO) << "Resolved path: " << resolved_path;
+
+  // Find the USB device in sysfs
+  return FindUsbDevice(resolved_path, vid_pid);
+}
+
 DeviceInfoV4l2::DeviceInfoV4l2() : DeviceInfoImpl() {}
 
 int32_t DeviceInfoV4l2::Init() {
@@ -85,8 +184,8 @@ int32_t DeviceInfoV4l2::GetDeviceName(uint32_t deviceNumber,
                                       uint32_t deviceNameLength,
                                       char* deviceUniqueIdUTF8,
                                       uint32_t deviceUniqueIdUTF8Length,
-                                      char* /*productUniqueIdUTF8*/,
-                                      uint32_t /*productUniqueIdUTF8Length*/) {
+                                      char* productUniqueIdUTF8,
+                                      uint32_t productUniqueIdUTF8Length) {
   // Travel through /dev/video [0-63]
   uint32_t count = 0;
   char device[20];
@@ -148,6 +247,17 @@ int32_t DeviceInfoV4l2::GetDeviceName(uint32_t deviceNumber,
       return -1;
     }
   }
+
+  if (productUniqueIdUTF8 != nullptr) {
+    char pid_vid[productUniqueIdUTF8Length];
+    memset(pid_vid, 0, sizeof(pid_vid));
+    if (GetDeviceVidPid(device, pid_vid) == 0) {
+      memset(productUniqueIdUTF8, 0, productUniqueIdUTF8Length);
+      memcpy(productUniqueIdUTF8, pid_vid, strlen(pid_vid));
+
+      RTC_LOG(LS_INFO) << " [vid:pid] => " << std::string(pid_vid);
+    }
+  } 
 
   return 0;
 }
