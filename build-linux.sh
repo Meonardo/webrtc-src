@@ -6,10 +6,10 @@ target_lib_dir="out/lib/Release"
 # check if debug build
 if [ "$1" == "debug" ]; then
   BUILD_TYPE="debug"
+  is_debug=true
   target_lib_dir="out/lib/Debug"
 else
   BUILD_TYPE="release"
-  is_debug=false
 fi
 
 # check if the out directory exists
